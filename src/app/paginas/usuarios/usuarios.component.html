@@ -1,0 +1,149 @@
+<div class="wrapper">
+  <app-menu></app-menu>
+  <div class="main">
+      <app-header></app-header>
+      <main class="content">
+          <div class="container-fluid p-0">
+              <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item" aria-current="page">
+                          <a routerLink="/">Home</a>
+                      </li>
+                      <li class="breadcrumb-item active" aria-current="page">Usuarios</li>
+                  </ol>
+              </nav>
+              <h1 class="h3 mb-3"><i class=" fas fa-users" ></i> Usuarios</h1>
+              <div class="row">
+                  <div class="col-12 col-lg-12  d-flex">
+                      <div class="card flex-fill">
+                          <div class="card-header">
+                              <a class="btn btn-outline-primary float-end" title="Crear" (click)="crear()">
+                                  <i class="fas fa-check"></i> Crear
+                              </a>
+                              <h5 class="card-title mb-0"> </h5>
+                          </div>
+                          <div class="card-body">
+                               <div class="table-responsive">
+                                  <table class="table table-bordered table-striped table-hover">
+                                      <thead>
+                                          <tr>
+                                              <th>ID</th>
+                                              <th>Nombre</th>
+                                              <th>E-Mail</th>
+                                              <th>Acciones</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                        @for(dato of datos; track dato.id)
+                                        {
+                                          <tr>
+                                              <td>{{dato.id}}</td>
+                                              <td>{{dato['nombre']}}</td>
+                                              <td>{{dato.correo}}</td>
+                                              <td class="text-center">
+                                                  <a (click)="editar(dato)" style="color:#3b7ddd;" title="Editar">
+                                                      <i class="fas fa-edit"></i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                        }
+
+                                      </tbody>
+                                  </table>
+                               </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </main>
+      <app-footer></app-footer>
+  </div>
+</div>
+<!--modal-->
+<ng-template #myModalConf let-modal>
+
+  <div class="modal-content" style="background-color: #fff;">
+      <div class="modal-header text-white   mb-3">
+
+          <h4 class="modal-title">{{modalTitle}}</h4>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cerrar( )" title="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+      <!--formulario-->
+      <form name="form" id="form" (submit)="enviar()" #formulario="ngForm">
+
+
+          <div class="mb-3">
+              <label for="nombre">Nombre: </label>
+              <input type="text" name="nombre" class="form-control" [(ngModel)]="modelo.nombre" #nombre="ngModel" required="true" placeholder="Nombre" />
+              @if(nombre.invalid && (nombre.dirty || nombre.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(nombre.errors){
+                          <div>
+                              El campo nombre es obligatorio
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+          <div class="mb-3">
+              <label for="correo">E-Mail: </label>
+              <input type="text" name="correo" class="form-control" [(ngModel)]="modelo.correo" #correo="ngModel" required="true" placeholder="E-Mail"  />
+              @if(correo.invalid && (correo.dirty || correo.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(correo.errors){
+                          <div>
+                              El campo E-Mail es obligatorio
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+          <div class="mb-3">
+              <label for="password">Contraseña: </label>
+              <input type="password" name="password" class="form-control" [(ngModel)]="modelo.password" #password="ngModel" required="true" placeholder="Contraseña"  />
+              @if(password.invalid && (password.dirty || password.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(password.errors){
+                          <div>
+                              El campo Contraseña es obligatorio
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+
+
+          <hr />
+         <div class="mb-3" style="text-align: right;">
+          @if(modalTitle=="Crear")
+          {
+              <button type="submit" class="btn btn-primary" [disabled]="!formulario.form.valid">
+                  <i class="fas fa-arrow-up"></i> Crear
+              </button>
+          }
+          @if(modalTitle=="Editar")
+          {
+              <button type="submit" class="btn btn-warning" [disabled]="!formulario.form.valid">
+                  <i class="fas fa-pencil"></i> Editar
+              </button>
+          }
+         </div>
+
+          <hr>
+      </form>
+      <!--fin formulario-->
+      </div>
+
+  </div>
+</ng-template>
+<!--//fin modal-->

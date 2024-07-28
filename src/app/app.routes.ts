@@ -6,11 +6,12 @@ import { GastosFijosComponent } from './paginas/gastos-fijos/gastos-fijos.compon
 import { GastosPorDiaComponent } from './paginas/gastos-por-dia/gastos-por-dia.component';
 import { ErrorComponent } from './paginas/error/error.component';
 import { AuthGuard } from './guards/auth.guard';
+import { UsuariosComponent } from './paginas/usuarios/usuarios.component';
 
 export const routes: Routes = [
   {path:"", component: HomeComponent, canActivate:[AuthGuard]},
     {path:"login", component: LoginComponent},
-    //{path:"usuarios", component: UsuariosComponent},
+    {path:"usuarios", component: UsuariosComponent},
     {path:"proveedores", component: ProveedoresComponent, canActivate:[AuthGuard]},
     {path:"gastos-fijos", component: GastosFijosComponent, canActivate:[AuthGuard]},
     {path:"gastos-por-dia", component: GastosPorDiaComponent, canActivate:[AuthGuard]},
