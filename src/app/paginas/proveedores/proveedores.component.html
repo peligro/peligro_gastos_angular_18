@@ -1,0 +1,119 @@
+<div class="wrapper">
+  <app-menu></app-menu>
+  <div class="main">
+      <app-header></app-header>
+      <main class="content">
+          <div class="container-fluid p-0">
+              <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item" aria-current="page">
+                          <a routerLink="/">Home</a>
+                      </li>
+                      <li class="breadcrumb-item active" aria-current="page">Proveedores con <strong>signalSlice</strong></li>
+                  </ol>
+              </nav>
+              <h1 class="h3 mb-3"><i class=" fas fa-truck-moving" ></i> Proveedores con <strong>signalSlice</strong></h1>
+              <div class="row">
+                  <div class="col-12 col-lg-12  d-flex">
+                      <div class="card flex-fill">
+                          <div class="card-header">
+                              <a class="btn btn-outline-primary float-end" title="Crear" (click)="crear()">
+                                  <i class="fas fa-check"></i> Crear
+                              </a>
+                              <h5 class="card-title mb-0"> </h5>
+                          </div>
+                          <div class="card-body">
+                            @switch (datos.state.status()) {
+                              @case ("loading") {
+                                <p>
+                                  <img src="/img/load.gif" alt="" />
+                                </p>
+                              }
+                              @case ("error") {
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                  <strong>Error!</strong> Ocurrió un error inesperado, vuelta a intentarlo más tarde
+                                  <button type="button" title="Cerrar" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                              }
+                              @default {
+                               <div class="table-responsive">
+                                  <table class="table table-bordered table-striped table-hover">
+                                      <thead>
+                                          <tr>
+                                              <th>ID</th>
+                                              <th>Nombre</th>
+                                              <th>Acciones</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                        @for (dato of datos.state().datos; track dato)
+                                        {
+                                          <tr>
+                                              <td>{{dato.id}}</td>
+                                              <td>{{dato.nombre}}</td>
+                                              <td class="text-center">
+                                                  <a style="color:#3b7ddd;" (click)="editar(dato)">
+                                                      <i class="fas fa-edit"></i>
+                                                  </a>
+                                              </td>
+                                          </tr>
+                                        }
+
+                                      </tbody>
+                                  </table>
+                               </div>
+                              }
+                            }
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </main>
+      <app-footer></app-footer>
+  </div>
+</div>
+<!--modal-->
+<ng-template #myModalConf let-modalsssss>
+  <div class="modal-content" style="background-color: #fff;">
+      <div class="modal-header text-white   mb-3">
+          <h4 class="modal-title">{{modalTitle}}</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cerrar( )" title="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+          <form name="form" id="form" (submit)="enviar()" #formulario="ngForm">
+              <div class="mb-3">
+                  <label for="nombre">Nombre: </label>
+                  <input type="text" name="nombre" class="form-control" [(ngModel)]="modelo.nombre" #nombre="ngModel" required="true" placeholder="Nombre" />
+                  @if(nombre.invalid && (nombre.dirty || nombre.touched))
+                  {
+                      <div class="alert alert-danger">
+                          @if(nombre.errors)
+                          {
+                              <div>
+                                  El campo nombre es obligatorio
+                              </div>
+                          }
+                      </div>
+                  }
+              </div>
+              <hr />
+          <div class="mb-3" style="text-align: right;">
+              @if(modalTitle=="Crear")
+              {
+                  <button type="submit" class="btn btn-primary" [disabled]="!formulario.form.valid">
+                      <i class="fas fa-arrow-up"></i> Crear
+                  </button>
+              }
+              @if(modalTitle=="Editar")
+              {
+                  <button type="submit" class="btn btn-warning" [disabled]="!formulario.form.valid">
+                      <i class="fas fa-pencil"></i> Editar
+                  </button>
+              }
+          </div>
+          </form>
+      </div>
+  </div>
+</ng-template>
+<!--/modal-->

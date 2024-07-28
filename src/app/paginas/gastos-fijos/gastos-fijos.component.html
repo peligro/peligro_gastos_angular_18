@@ -1,0 +1,198 @@
+<div class="wrapper">
+  <app-menu></app-menu>
+  <div class="main">
+      <app-header></app-header>
+      <main class="content">
+          <div class="container-fluid p-0">
+              <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item" aria-current="page">
+                          <a routerLink="/">Home</a>
+                      </li>
+                      <li class="breadcrumb-item active" aria-current="page">Gastos fijos <strong>{{getMesActual()}} de {{fecha | date:'YYYY'}}</strong></li>
+                  </ol>
+              </nav>
+              <h1 class="h3 mb-3"><i class=" fas fa-list-alt" ></i> Gastos fijos <strong>{{getMesActual()}} de {{fecha | date:'YYYY'}}</strong></h1>
+              <div class="row">
+                  <div class="col-12 col-lg-12  d-flex">
+                      <div class="card flex-fill">
+                          <div class="card-header">
+                              <a class="btn btn-outline-primary float-end" title="Crear" (click)="crear()">
+                                  <i class="fas fa-check"></i> Crear
+                              </a>
+                              <h5 class="card-title mb-0">Pagado: ${{si | formatearNumero}}</h5>
+                              <h5 class="card-title mb-0">No Pagado: ${{no | formatearNumero}}</h5>
+                              <h5 class="card-title mb-0">Total gastos: ${{si+no  | formatearNumero}}</h5>
+                          </div>
+                          <div class="card-body">
+                               <div class="table-responsive">
+                                  <table class="table table-bordered table-striped table-hover">
+                                      <thead class="table-info">
+                                          <tr>
+                                              <th>N°</th>
+                                              <th>Estado</th>
+                                              <th>Nombre</th>
+                                              <th>Monto</th>
+                                              <th>Proveedor</th>
+                                              <th>Fecha</th>
+                                              <th>Acciones</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                        @for(dato of datos; track dato)
+                                        {
+                                          <tr>
+                                              <td>{{dato.id}}</td>
+                                              <td>{{dato.estados}}</td>
+                                              <td>{{dato.nombre}}</td>
+                                              <td>${{dato.monto | formatearNumero}}</td>
+                                              <td>{{dato.proveedores}}</td>
+                                              <td>{{dato.fecha | formatearFecha}}</td>
+                                              <td class="text-center">
+                                                  <!--<a (click)="editar(dato)" style="color:#3b7ddd;" title="Editar">
+                                                      <i class="fas fa-edit"></i>
+                                                  </a>
+
+                                                  &nbsp;&nbsp;
+                                                -->
+                                                  <a (click)="eliminar(dato.id)" title="Eliminar" style="color:#3b7ddd;">
+                                                      <i class="fas fa-trash"></i>
+                                                  </a>
+
+                                              </td>
+                                          </tr>
+                                        }
+
+
+                                      </tbody>
+                                  </table>
+                               </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </main>
+      <app-footer></app-footer>
+  </div>
+</div>
+<!--modal-->
+<ng-template #myModalConf let-modal>
+
+  <div class="modal-content" style="background-color: #fff;">
+      <div class="modal-header text-white   mb-3">
+
+          <h4 class="modal-title">{{modalTitle}}</h4>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="cerrar( )" title="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+      <!--formulario-->
+      <form name="form" id="form" (submit)="enviar()" #formulario="ngForm">
+          @if(modalTitle=="Editar")
+          {
+              <div class="mb-3">
+                  <label for="estadosId">Estado: </label>
+                  <select name="estadosId" class="form-control" [(ngModel)]="modelo.estadosId" #estadosId="ngModel"  pattern="[1-9]\d*" required="true">
+                      <option value="0">Seleccione.....</option>
+                      @for(estado of estados; track estado.id)
+                      {
+                          <option value="{{estado.id}}">
+                              {{estado.nombre}}
+                          </option>
+                      }
+
+                  </select>
+                  @if(estadosId.invalid && (estadosId.dirty || estadosId.touched))
+                  {
+                      <div class="alert alert-danger">
+                          @if(estadosId.errors){
+                              <div>
+                                  Debe seleccionar un estado
+                              </div>
+                          }
+
+                      </div>
+                  }
+              </div>
+          }
+
+          <div class="mb-3">
+              <label for="proveedoresId">Proveedor: </label>
+               <select name="proveedoresId" id="proveedoresId" class="form-control" [(ngModel)]="modelo.proveedores_id" #proveedores_id="ngModel" pattern="[1-9]\d*" required="true">
+                  <option value="0">Seleccione.....</option>
+                  @for(proveedor of proveedores; track proveedor.id)
+                  {
+                      <option value="{{proveedor.id}}">{{proveedor.nombre}}</option>
+                  }
+               </select>
+               @if(proveedores_id.invalid && (proveedores_id.dirty || proveedores_id.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(proveedores_id.errors){
+                          <div>
+                              Debe seleccionar un proveedor
+                          </div>
+                      }
+
+                  </div>
+              }
+
+          </div>
+          <div class="mb-3">
+              <label for="nombre">Nombre: </label>
+              <input type="text" name="nombre" class="form-control" [(ngModel)]="modelo.nombre" #nombre="ngModel" required="true" placeholder="Nombre" />
+              @if(nombre.invalid && (nombre.dirty || nombre.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(nombre.errors){
+                          <div>
+                              El campo nombre es obligatorio
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+          <div class="mb-3">
+              <label for="monto">Monto: </label>
+              <input type="number" name="monto" class="form-control" [(ngModel)]="modelo.monto" #monto="ngModel" required="true" min="0" step="1"  />
+              @if(monto.invalid && (monto.dirty || monto.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(monto.errors){
+                          <div>
+                              El campo monto es obligatorio. El campo monto admite sólo números
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+
+
+          <hr />
+         <div class="mb-3" style="text-align: right;">
+          @if(modalTitle=="Crear")
+          {
+              <button type="submit" class="btn btn-primary" [disabled]="!formulario.form.valid">
+                  <i class="fas fa-arrow-up"></i> Crear
+              </button>
+          }
+          @if(modalTitle=="Editar")
+          {
+              <button type="submit" class="btn btn-warning" [disabled]="!formulario.form.valid">
+                  <i class="fas fa-pencil"></i> Editar
+              </button>
+          }
+         </div>
+
+          <hr>
+      </form>
+      <!--fin formulario-->
+      </div>
+
+  </div>
+</ng-template>
+<!--//fin modal-->

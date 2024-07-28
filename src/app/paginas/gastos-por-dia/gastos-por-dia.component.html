@@ -1,0 +1,200 @@
+<div class="wrapper">
+  <app-menu></app-menu>
+  <div class="main">
+      <app-header></app-header>
+      <main class="content">
+          <div class="container-fluid p-0">
+              <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                      <li class="breadcrumb-item" aria-current="page">
+                          <a routerLink="/">Home</a>
+                      </li>
+                      <li class="breadcrumb-item active" aria-current="page">Gastos por día {{getMesActual()}} de {{fecha | date:'YYYY'}}</li>
+                  </ol>
+              </nav>
+              <h1 class="h3 mb-3"><i class=" fas fa-list-alt" ></i> Gastos por día {{getMesActual()}} de {{fecha | date:'YYYY'}}</h1>
+              <div class="row">
+                  <div class="col-12 col-lg-12  d-flex">
+                      <div class="card flex-fill">
+                          <div class="card-header">
+                              <a class="btn btn-outline-primary float-end" title="Crear" (click)="crear()">
+                                  <i class="fas fa-check"></i> Crear
+                              </a>
+                              <h5 class="card-title mb-0">Total: ${{total | formatearNumero}} </h5>
+                          </div>
+                          <div class="card-body">
+                               <div class="table-responsive">
+                                  <table class="table table-bordered table-striped table-hover">
+                                      <thead>
+                                          <tr>
+                                              <th>N°</th>
+                                              <th>Neto</th>
+                                              <th>IVA</th>
+                                              <th>Total</th>
+                                              <th>Proveedor</th>
+                                              <th>Fecha</th>
+                                              <th>Glosa</th>
+                                              <th>Acciones</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          @for(dato of datos; track dato.id)
+                                          {
+                                              <tr>
+                                                  <td>{{dato.id}}</td>
+                                                  <td>${{dato.neto | formatearNumero}}</td>
+                                                  <td>${{dato.iva | formatearNumero}}</td>
+                                                  <td>${{dato.total | formatearNumero}}</td>
+                                                  <td>{{dato.proveedores}}</td>
+                                                  <td>{{dato.fecha | formatearFecha}}</td>
+                                                  <td>{{dato.glosa}}</td>
+                                                  <td class="text-center">
+                                                      <a (click)="editar(dato)" style="color:#3b7ddd;" title="Editar">
+                                                          <i class="fas fa-edit"></i>
+                                                      </a>
+
+                                                      &nbsp;&nbsp;
+                                                      <a (click)="eliminar(dato.id)" title="Eliminar" style="color:#3b7ddd;">
+                                                          <i class="fas fa-trash"></i>
+                                                      </a>
+
+                                                  </td>
+                                              </tr>
+                                          }
+
+                                      </tbody>
+                                  </table>
+                               </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </main>
+      <app-footer></app-footer>
+  </div>
+</div>
+<!--modal-->
+<ng-template #myModalConf let-modal>
+
+  <div class="modal-content" style="background-color: #fff;">
+      <div class="modal-header text-white   mb-3">
+
+          <h4 class="modal-title">{{modalTitle}}</h4>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="modal.close('Cerrado desde la ventana')" title="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+      <!--formulario-->
+      <form name="form" id="form" (submit)="enviar()" #formulario="ngForm">
+
+          <div class="mb-3">
+              <label for="proveedores_id">Proveedor: </label>
+              <select name="proveedores_id" class="form-control" [(ngModel)]="modelo.proveedores_id" #proveedores_id="ngModel"  pattern="[1-9]\d*" required="true">
+                  <option value="0">Seleccione.....</option>
+                  @for(proveedor of proveedores; track proveedor.id)
+                  {
+                      <option value="{{proveedor.id}}">
+                          {{proveedor.nombre}}
+                      </option>
+                  }
+
+              </select>
+              @if(proveedores_id.invalid && (proveedores_id.dirty || proveedores_id.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(proveedores_id.errors){
+                          <div>
+                              Debe seleccionar un proveedor
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+          <div class="mb-3">
+              <label for="neto">Neto: </label>
+              <input type="number" name="monto" class="form-control" [(ngModel)]="modelo.neto" #neto="ngModel" required="true" min="0" step="1" placeholder="Neto"  />
+              @if(neto.invalid && (neto.dirty || neto.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(neto.errors){
+                          <div>
+                              El campo neto es obligatorio. El campo neto admite sólo números
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+          <div class="mb-3">
+              <label for="iva">IVA: </label>
+              <input type="number" name="iva" class="form-control" [(ngModel)]="modelo.iva" #iva="ngModel" required="true" min="0" step="1" placeholder="IVA" />
+              @if(iva.invalid && (iva.dirty || iva.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(iva.errors){
+                          <div>
+                              El campo IVA es obligatorio. El campo IVA admite sólo números
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+          <div class="mb-3">
+              <label for="total">Total: </label>
+              <input type="number" name="total" class="form-control" [(ngModel)]="modelo.total" #total="ngModel" required="true" min="0" step="1" placeholder="Total" />
+              @if(total.invalid && (total.dirty || total.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(total.errors){
+                          <div>
+                              El campo total es obligatorio. El campo total admite sólo números
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+          <div class="mb-3">
+              <label for="glosa">Glosa: </label>
+              <textarea name="glosa"  class="form-control" [(ngModel)]="modelo.glosa" #glosa="ngModel" required="true" placeholder="Glosa" ></textarea>
+              @if(glosa.invalid && (glosa.dirty || glosa.touched))
+              {
+                  <div class="alert alert-danger">
+                      @if(glosa.errors){
+                          <div>
+                              El campo Glosa es obligatorio
+                          </div>
+                      }
+
+                  </div>
+              }
+          </div>
+
+          <hr />
+         <div class="mb-3" style="text-align: right;">
+          @if(modalTitle=="Crear")
+          {
+              <button type="submit" class="btn btn-primary" [disabled]="!formulario.form.valid">
+                  <i class="fas fa-arrow-up"></i> Crear
+              </button>
+          }
+          @if(modalTitle=="Editar")
+          {
+              <button type="submit" class="btn btn-warning" [disabled]="!formulario.form.valid">
+                  <i class="fas fa-pencil"></i> Editar
+              </button>
+          }
+         </div>
+
+          <hr>
+      </form>
+      <!--fin formulario-->
+      </div>
+
+  </div>
+</ng-template>
+<!--//fin modal-->
